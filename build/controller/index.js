@@ -33,15 +33,16 @@ const resizeImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const filename = req.query.filename;
     const width = parseInt(req.query.width);
     const height = parseInt(req.query.height);
+    const parms = console.log(req);
     try {
         const fileExtension = yield getFileExtension(filename);
         // check if the provided file extension is supported
         if (fileExtension === -1) {
-            res.send("Invalid query parameters. Provide a filename, width and height");
+            res.status(400).send("Invalid query parameters. Provide a filename, width and height");
             return;
         }
         if (Number.isNaN(width) || Number.isNaN(height)) {
-            res.send("Invalid image parameters. Missing width or height parameters");
+            res.status(400).send("Invalid image parameters. Missing width or height parameters");
             return;
         }
         // cache properties
@@ -56,10 +57,10 @@ const resizeImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             background: { r: 255, g: 255, b: 255, alpha: 0.5 }
         })
             .toFile(`src/images/thumb/${filename}_thumb.${fileExtension}`);
-        res.sendFile(path.resolve(`src/images/thumb/${filename}_thumb.${fileExtension}`), options);
+        res.status(200).sendFile(path.resolve(`src/images/thumb/${filename}_thumb.${fileExtension}`), options);
     }
     catch (error) {
-        res.send(`Image file does not exist or image parameters must be greater than 0 ${error}`);
+        res.status(400).send(`Image file does not exist or image parameters must be greater than 0 ${error}`);
     }
 });
 module.exports = {

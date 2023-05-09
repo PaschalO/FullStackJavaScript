@@ -10,7 +10,7 @@ const port = 3000;
 app.use("/", express_1.default.static(__dirname + "/view"));
 app.use("/images", express_1.default.static(__dirname + "/images/thumb"));
 app.use("/api", route_1.default);
-//app.use("/api/images", routes);
+app.use("/api/images", route_1.default);
 app.use("*", (req, res) => {
     res.status(404).send("Page not found");
 });

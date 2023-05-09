@@ -21,14 +21,13 @@ const request = (0, supertest_1.default)(index_1.default);
 //const PORT = 3000;
 (0, node_test_1.describe)("Test endpoint response", () => {
     it("gets the valid api endpoint response", (done) => __awaiter(void 0, void 0, void 0, function* () {
-        const validEndpoint = `http://localhost:3000/api/images?filename=fjord&width=500&height=400`;
-        const response = yield request.get(validEndpoint);
-        expect(response.status).toBe(200);
+        const response = yield request.get('/api/images?filename=fjord&width=300&height=300');
+        expect(response.status).toEqual(200);
         done();
     }));
     it("gets the invalid api endpoint response", (done) => __awaiter(void 0, void 0, void 0, function* () {
-        const NotFound = `http://localhost:3000/api/images/hello`;
-        const response = yield request.get(NotFound);
+        //const NotFound = `http://localhost:3000/api/images/hello`;
+        const response = yield request.get('/api/images/hello');
         expect(response.status).toBe(404);
         done();
     }));

@@ -9,15 +9,14 @@ const request = supertest(app);
 
 describe("Test endpoint response", () => {
 	it("gets the valid api endpoint response", async (done) => {
-		const validEndpoint = `http://localhost:3000/api/images?filename=fjord&width=500&height=400`;
-		const response = await request.get(validEndpoint);
-		expect(response.status).toBe(200);
+		const response = await request.get('/api/images?filename=fjord&width=300&height=300');
+		expect(response.status).toEqual(200);
 		done();
 	});
 
 	it("gets the invalid api endpoint response", async (done) => {
-		const NotFound = `http://localhost:3000/api/images/hello`;
-		const response = await request.get(NotFound);
+		//const NotFound = `http://localhost:3000/api/images/hello`;
+		const response = await request.get('/api/images/hello');
 		expect(response.status).toBe(404);
 		done();
 	});

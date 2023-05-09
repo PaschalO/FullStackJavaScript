@@ -23,19 +23,20 @@ const resizeImage = async (req: Request, res: Response): Promise<void> => {
 	const filename: string = req.query.filename as string;
 	const width: number = parseInt(<string>req.query.width);
 	const height: number = parseInt(<string>req.query.height);
+	const parms = console.log(req);
 
 	try {
 		const fileExtension = await getFileExtension(filename);
 		// check if the provided file extension is supported
 		if (fileExtension === -1) {
-			res.send(
+			res.status(400).send(
 				"Invalid query parameters. Provide a filename, width and height"
 			);
 			return;
 		}
 
 		if (Number.isNaN(width) || Number.isNaN(height)) {
-			res.send(
+			res.status(400).send(
 				"Invalid image parameters. Missing width or height parameters"
 			);
 			return;
@@ -53,12 +54,12 @@ const resizeImage = async (req: Request, res: Response): Promise<void> => {
 			})
 			.toFile(`src/images/thumb/${filename}_thumb.${fileExtension}`);
 
-		res.sendFile(
+		res.status(200).sendFile(
 			path.resolve(`src/images/thumb/${filename}_thumb.${fileExtension}`),
 			options
 		);
 	} catch (error) {
-		res.send(
+		res.status(400).send(
 			`Image file does not exist or image parameters must be greater than 0 ${error}`
 		);
 	}
