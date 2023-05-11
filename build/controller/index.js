@@ -33,7 +33,6 @@ const resizeImage = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     const filename = req.query.filename;
     const width = parseInt(req.query.width);
     const height = parseInt(req.query.height);
-    const parms = console.log(req);
     try {
         const fileExtension = yield getFileExtension(filename);
         // check if the provided file extension is supported

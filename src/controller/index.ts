@@ -23,7 +23,6 @@ const resizeImage = async (req: Request, res: Response): Promise<void> => {
 	const filename: string = req.query.filename as string;
 	const width: number = parseInt(<string>req.query.width);
 	const height: number = parseInt(<string>req.query.height);
-	const parms = console.log(req);
 
 	try {
 		const fileExtension = await getFileExtension(filename);
