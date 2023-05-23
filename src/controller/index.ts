@@ -4,7 +4,7 @@ const path = require("path");
 const sharp = require("sharp");
 const getFileExtension = async (filename: string): Promise<unknown> => {
 	try {
-		const files: string[] = await readdir(`src/images/full`);
+		const files: string[] = await readdir(path.join(__dirname, `../../images/full`));
 		const supportedFormat: string[] = ["jpg", "svg"];
 		for (const file of files) {
 			const splitFileName: string[] = file.split(".");
@@ -45,16 +45,16 @@ const resizeImage = async (req: Request, res: Response): Promise<void> => {
 			maxAge: 172800000,
 			cacheControl: true
 		};
-		await sharp(`src/images/full/${filename}.${fileExtension}`)
+		await sharp(path.join(__dirname, `/../../images/full/${filename}.${fileExtension}`))
 			.resize({
 				width,
 				height,
 				background: { r: 255, g: 255, b: 255, alpha: 0.5 }
 			})
-			.toFile(`src/images/thumb/${filename}_thumb.${fileExtension}`);
+			.toFile(path.join(__dirname, `/../../images/thumb/${filename}_thumb.${fileExtension}`));
 
 		res.status(200).sendFile(
-			path.resolve(`src/images/thumb/${filename}_thumb.${fileExtension}`),
+			path.join(__dirname, `/../../images/thumb/${filename}_thumb.${fileExtension}`),
 			options
 		);
 	} catch (error) {

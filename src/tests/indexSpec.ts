@@ -26,8 +26,8 @@ describe("Test Image processing", () => {
 	const width = '300';
 	const height = '300';
 	//const inputPath: string = `src/images/full/${filename}.${fileExtension}`;
-	const outputPath = `src/images/thumb/${filename}_thumb.${fileExtension}`;
-	const api: string = `/images?filename=${filename}&width=${width}&height=${height}`;
+	const outputPath = `/../../images/thumb/${filename}_thumb.${fileExtension}`;
+	const api: string = `/../../images?filename=${filename}&width=${width}&height=${height}`;
 
 
 	it("should return an error if no query parameters are provided", async () => {
