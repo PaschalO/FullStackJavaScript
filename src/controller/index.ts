@@ -1,11 +1,17 @@
 import { Request, Response } from "express";
 import { readdir } from "node:fs/promises";
-const path = require("path");
-const sharp = require("sharp");
+import * as path from "path";
+import sharp from "sharp";
+import * as fs from "fs";
+
 const getFileExtension = async (filename: string): Promise<unknown> => {
 	try {
-		const files: string[] = await readdir(path.join(__dirname, `../../images/full`));
+		const inputFolderPath = `/../../images/full`;
 		const supportedFormat: string[] = ["jpg", "svg"];
+		const files: string[] = await readdir(
+			path.join(__dirname, inputFolderPath)
+		);
+
 		for (const file of files) {
 			const splitFileName: string[] = file.split(".");
 			if (splitFileName[0] === filename) {
@@ -19,51 +25,64 @@ const getFileExtension = async (filename: string): Promise<unknown> => {
 	}
 };
 
-const resizeImage = async (req: Request, res: Response): Promise<void> => {
-	const filename: string = req.query.filename as string;
-	const width: number = parseInt(<string>req.query.width);
-	const height: number = parseInt(<string>req.query.height);
-
+const resizeImageImageHelper = async (
+	filename: string,
+	width: number,
+	height: number
+): Promise<boolean> => {
 	try {
 		const fileExtension = await getFileExtension(filename);
-		// check if the provided file extension is supported
-		if (fileExtension === -1) {
-			res.status(400).send(
-				"Invalid query parameters. Provide a filename, width and height"
-			);
-			return;
-		}
 
-		if (Number.isNaN(width) || Number.isNaN(height)) {
-			res.status(400).send(
-				"Invalid image parameters. Missing width or height parameters"
-			);
-			return;
-		}
-		// cache properties
-		const options: { maxAge: number; cacheControl: boolean } = {
-			maxAge: 172800000,
-			cacheControl: true
-		};
-		await sharp(path.join(__dirname, `/../../images/full/${filename}.${fileExtension}`))
+		if (fileExtension === -1) return false;
+
+		const outputPath = `/../../images/thumb/${filename}_thumb.${fileExtension}`;
+		const inputPath = `/../../images/full/${filename}.${fileExtension}`;
+
+		await sharp(path.join(__dirname, inputPath))
 			.resize({
 				width,
 				height,
 				background: { r: 255, g: 255, b: 255, alpha: 0.5 }
 			})
-			.toFile(path.join(__dirname, `/../../images/thumb/${filename}_thumb.${fileExtension}`));
+			.toFile(path.join(__dirname, outputPath));
 
-		res.status(200).sendFile(
-			path.join(__dirname, `/../../images/thumb/${filename}_thumb.${fileExtension}`),
-			options
-		);
-	} catch (error) {
+		return true;
+	} catch (e) {
+		return false;
+	}
+};
+
+const resizeImage = async (req: Request, res: Response): Promise<void> => {
+	const filename: string = req.query.filename as string;
+	const width: number = parseInt(<string>req.query.width);
+	const height: number = parseInt(<string>req.query.height);
+
+	const resize = await resizeImageImageHelper(filename, width, height);
+
+	if (!resize) {
 		res.status(400).send(
-			`Image file does not exist or image parameters must be greater than 0 ${error}`
+			`Image file does not exist, file format not supported, or the height and width parameters are less than 0`
 		);
+	} else {
+		const fileExtension = await getFileExtension(filename);
+		const outputPath = `/../../images/thumb/${filename}_thumb.${fileExtension}`;
+
+		const options: { maxAge: number; cacheControl: boolean } = {
+			maxAge: 172800000,
+			cacheControl: true
+		};
+
+		// if the generated image already exists, serve that instead
+		if (fs.existsSync(path.join(__dirname, outputPath))) {
+			res.status(200).sendFile(path.join(__dirname, outputPath));
+		}
+
+		// else serve a new generated image
+		res.status(200).sendFile(path.join(__dirname, outputPath), options);
 	}
 };
 
 module.exports = {
+	resizeImageImageHelper,
 	resizeImage
 };
